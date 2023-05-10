@@ -1,15 +1,40 @@
-"use client";
 import { useNutrientTable, Nutrient } from "../context/NutrientTableContext";
 
+const NO_DV = [
+  "Calories",
+  "Trans/Trans",
+  "Carbohydrate/Glucides",
+  "Protein/Protéines",
+  "Cholesterol/Cholestérol",
+];
 const NutrientTable = () => {
+  const { getRoundedAmt, nutrients, setNutrients } =
+    useNutrientTable();
 
-  const {getRoundedAmt, nutrients, handleAmountChange} = useNutrientTable();
   const getDV = (name: string, value: number, dailyValue: number) => {
-    return Math.round((getRoundedAmt(name, value)/dailyValue*100) / 1) * 1;
-  }
+    const dv =
+      Math.round(((getRoundedAmt(name, value) / dailyValue) * 100) / 1) * 1;
+    return { dv };
+  };
+
+  const handleAmountChangeWithDV = (
+    id: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+    const nutrient = nutrients.find((nutrient: Nutrient) => nutrient.id === id);
+    if (nutrient) {
+      const dv = getDV(nutrient.name, Number(value), nutrient.dailyValue || 0);
+      const updatedNutrient = { ...nutrient, [name]: Number(value), ...dv };
+      const updatedNutrients = nutrients.map((nutrient:Nutrient) =>
+        nutrient.id === id ? updatedNutrient : nutrient
+      );
+      setNutrients(updatedNutrients);
+    }
+  };
 
   return (
-    <table>
+    <table className="mb-4">
       <thead>
         <tr>
           <th>Unit of Measure (um)</th>
@@ -28,15 +53,19 @@ const NutrientTable = () => {
                 className="text-center"
                 type="number"
                 step="0.01"
+                name="amount"
+                placeholder={nutrient.placeholderAmount}
                 value={nutrient.amount}
-                onChange={(event) => handleAmountChange(nutrient.id, event)}
+                onChange={(event) =>
+                  handleAmountChangeWithDV(nutrient.id, event)
+                }
               />
             </td>
-            <td>
-              {getRoundedAmt(nutrient.name, nutrient.amount)}
-            </td>
+            <td>{getRoundedAmt(nutrient.name, nutrient.amount)}</td>
             <td className="w-36">{nutrient.name}</td>
-            <td className="w-16">{nutrient.dailyValue? getDV(nutrient.name, nutrient.amount, nutrient.dailyValue) : ''}</td>
+            {!NO_DV.includes(nutrient.name) && (
+              <td className="w-16">{nutrient.dv || ""}</td>
+            )}
           </tr>
         ))}
       </tbody>

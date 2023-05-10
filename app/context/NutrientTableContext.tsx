@@ -3,79 +3,92 @@ import { createContext, useState, useContext } from "react";
 export type Nutrient = {
   id: number;
   uom: string;
-  amount: number;
+  amount?: number;
+  placeholderAmount: number;
   name: string;
   dailyValue?: number;
+  dv?: number;
 };
 
-export const NutrientTableContext = createContext<Array<Nutrient>>([]);
+export type NutrientTableContextType = {
+  nutrients: Nutrient[];
+  setNutrients: React.Dispatch<React.SetStateAction<Nutrient[]>>;
+  handleAmountChange: (id: number, event: React.ChangeEvent<HTMLInputElement>) => void;
+  getRoundedAmt: (name: string, value: number) => number;
+};
+
+export const NutrientTableContext = createContext<NutrientTableContextType>({
+  nutrients: [],
+  setNutrients: () => {},
+  handleAmountChange: () => {},
+  getRoundedAmt: () => 0,
+});
 
 export const NutrientTableProvider = ({ children }: { children: React.ReactNode }) => {
   const [nutrients, setNutrients] = useState([
-    { id: 1, uom: "kcal", amount: 200.00, name: "Calories", roundedAmt: 0 },
+    { id: 1, uom: "kcal", placeholderAmount: 200.00, name: "Calories", roundedAmt: 0 },
     {
       id: 2,
       uom: "g",
-      amount: 10.00,
+      placeholderAmount: 10.00,
       name: "Fat/Lipides",
       dailyValue: 75,
     },
     {
       id: 3,
       uom: "g",
-      amount: 5.00,
+      placeholderAmount: 5.00,
       name: "Saturated/Saturé",
       dailyValue: 20,
     },
-    { id: 4, uom: "g", amount: 0.00, name: "Trans/Trans" },
-    { id: 5, uom: "g", amount: 30.00, name: "Carbohydrate/Glucides" },
+    { id: 4, uom: "g", placeholderAmount: 0.00, name: "Trans/Trans" },
+    { id: 5, uom: "g", placeholderAmount: 30.00, name: "Carbohydrate/Glucides" },
     {
       id: 6,
       uom: "g",
-      amount: 5.00,
+      placeholderAmount: 5.00,
       name: "Fibre/Fibres",
       dailyValue: 28,
     },
     {
       id: 7,
       uom: "g",
-      amount: 20.00,
+      placeholderAmount: 20.00,
       name: "Sugars/Sucres",
       dailyValue: 100,
     },
-    { id: 8, uom: "g", amount: 25.00, name: "Protein/Protéines" },
+    { id: 8, uom: "g", placeholderAmount: 25.00, name: "Protein/Protéines" },
     {
       id: 9,
       uom: "mg",
-      amount: 15.00,
+      placeholderAmount: 15.00,
       name: "Cholesterol/Cholestérol",
-      dailyValue: 300,
     },
     {
       id: 10,
       uom: "mg",
-      amount: 300.00,
+      placeholderAmount: 300.00,
       name: "Sodium",
       dailyValue: 2300,
     },
     {
       id: 11,
       uom: "mg",
-      amount: 500.00,
+      placeholderAmount: 500.00,
       name: "Potassium",
       dailyValue: 3400,
     },
     {
       id: 12,
       uom: "mg",
-      amount: 100.00,
+      placeholderAmount: 100.00,
       name: "Calcium",
       dailyValue: 1300,
     },
     {
       id: 13,
       uom: "mg",
-      amount: 2.00,
+      placeholderAmount: 2.00,
       name: "Iron/Fer",
       dailyValue: 18,
     },
@@ -161,7 +174,7 @@ export const NutrientTableProvider = ({ children }: { children: React.ReactNode 
 
   return (
     <NutrientTableContext.Provider
-      value={{ nutrients, handleAmountChange, getRoundedAmt }}
+      value={{ nutrients, setNutrients, handleAmountChange, getRoundedAmt }}
     >
       {children}
     </NutrientTableContext.Provider>
