@@ -1,6 +1,8 @@
 "use client";
 import NutrientTable from "./components/NutrientTable";
 import InfoTable from "./components/InfoTable";
+import { NutrientTableProvider } from "./context/NutrientTableContext";
+import { InfoTableProvider } from "./context/InfoTableContext";
 
 export default function Home() {
   return (
@@ -9,8 +11,12 @@ export default function Home() {
         <header className="flex justify-center my-4">
           <h1 className="text-xl font-bold">FOP/NFT Calculator</h1>
         </header>
-        <InfoTable />
-        <NutrientTable />
+        <NutrientTableProvider>
+          <InfoTableProvider>
+            <InfoTable />
+            <NutrientTable />
+          </InfoTableProvider>
+        </NutrientTableProvider>
       </div>
     </>
   );
